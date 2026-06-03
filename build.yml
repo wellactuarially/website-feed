@@ -1,0 +1,40 @@
+name: Build media stream
+
+on:
+  schedule:
+    # 13:00 UTC = 6:00 AM Pacific (PDT). Adjust if you like.
+    - cron: "0 13 * * *"
+  workflow_dispatch: {}   # lets you run it manually from the Actions tab
+
+permissions:
+  contents: write          # needed to commit feed.html back to the repo
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Build feed.html
+        env:
+          GOODREADS_RSS: ${{ vars.GOODREADS_RSS }}
+          LETTERBOXD_RSS: ${{ vars.LETTERBOXD_RSS }}
+          TRAKT_USERNAME: ${{ vars.TRAKT_USERNAME }}
+          TRAKT_CLIENT_ID: ${{ secrets.TRAKT_CLIENT_ID }}
+        run: node build.mjs
+
+      - name: Commit if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet feed.html; then
+            git add feed.html
+            git commit -m "Update media stream ($(date -u +%Y-%m-%d))"
+            git push
+          else
+            echo "No changes."
+          fi
