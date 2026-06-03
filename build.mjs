@@ -26,6 +26,7 @@ const CONFIG = {
     || "https://letterboxd.com/wellactuarially/rss",
   traktClientId: process.env.TRAKT_CLIENT_ID || "",
   traktUsername: process.env.TRAKT_USERNAME || "wellactuarially",
+  tmdbToken: process.env.TMDB_TOKEN || "",
   perSection: 10,
 };
 
