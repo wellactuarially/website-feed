@@ -92,10 +92,11 @@ async function fetchBooks() {
   return items(xml).map((it) => {
     const title = tag(it, "title");
     const author = tag(it, "author_name");
-    // Goodreads puts the user's star rating in <user_rating>0-5</user_rating>
     const r = parseInt(tag(it, "user_rating"), 10);
     const review = stripTags(tag(it, "user_review"));
-    // Prefer the user's read date; fall back to pubDate.
+    const desc = tag(it, "description");
+    const coverMatch = desc.match(/<img[^>]+src="([^"]+)"/i);
+    const image = coverMatch ? coverMatch[1] : null;
     const dateStr = tag(it, "user_read_at") || tag(it, "pubDate");
     return {
       type: "books",
@@ -105,6 +106,7 @@ async function fetchBooks() {
       note: review || "",
       date: dateStr ? new Date(dateStr) : null,
       link: tag(it, "link"),
+      image,
     };
   });
 }
@@ -122,7 +124,10 @@ async function fetchFilm() {
       const rRaw = tag(it, "letterboxd:memberRating");
       const r = rRaw ? parseFloat(rRaw) : null;
       const rewatch = tag(it, "letterboxd:rewatch") === "Yes";
-      const review = stripTags(tag(it, "description"));
+      const rawDesc = tag(it, "description");
+      const imgMatch = rawDesc.match(/<img[^>]+src="([^"]+)"/i);
+      const image = imgMatch ? imgMatch[1] : null;
+      const review = stripTags(rawDesc);
       // watchedDate is the diary date; fall back to pubDate.
       const dateStr = tag(it, "letterboxd:watchedDate") || tag(it, "pubDate");
       return {
@@ -135,6 +140,7 @@ async function fetchFilm() {
         note: /Watched on/i.test(review) ? "" : review,
         date: dateStr ? new Date(dateStr) : null,
         link: tag(it, "link"),
+        image,
       };
     })
     .filter(Boolean);
