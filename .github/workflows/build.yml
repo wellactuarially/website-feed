@@ -25,7 +25,9 @@ jobs:
           LETTERBOXD_RSS: ${{ vars.LETTERBOXD_RSS }}
           TRAKT_USERNAME: ${{ vars.TRAKT_USERNAME }}
           TRAKT_CLIENT_ID: ${{ secrets.TRAKT_CLIENT_ID }}
-        run: node build.mjs
+        run: |
+          echo "Client ID length: ${#TRAKT_CLIENT_ID}"
+          node build.mjs
 
       - name: Commit if changed
         run: |
