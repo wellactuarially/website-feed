@@ -152,9 +152,15 @@ async function fetchTv() {
       "Content-Type": "application/json",
       "trakt-api-version": "2",
       "trakt-api-key": CONFIG.traktClientId,
+      // Cloudflare (in front of Trakt) tends to block requests with no/odd
+      // User-Agent from datacenter IPs. Identify ourselves like a normal client.
+      "User-Agent": "media-stream/1.0 (https://github.com/wellactuarially/website-feed)",
     },
   });
-  if (!res.ok) throw new Error(`Trakt HTTP ${res.status}`);
+  if (!res.ok) {
+    const body = (await res.text()).slice(0, 300);
+    throw new Error(`Trakt HTTP ${res.status} :: ${body}`);
+  }
   const rows = await res.json();
   return rows.map((row) => {
     const show = row.show || {};
