@@ -132,7 +132,7 @@ async function fetchFilm() {
         rating: Number.isFinite(r) ? r : null,
         // The description repeats the poster + "Watched on ..." text; only keep
         // it if there's an actual review beyond the boilerplate.
-        note: /Watched on/i.test(review) ? "" : truncate(review, 160),
+        note: /Watched on/i.test(review) ? "" : review,
         date: dateStr ? new Date(dateStr) : null,
         link: tag(it, "link"),
       };
