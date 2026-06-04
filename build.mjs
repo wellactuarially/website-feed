@@ -22,6 +22,8 @@ import { writeFile } from "node:fs/promises";
 const CONFIG = {
   goodreadsRss: process.env.GOODREADS_RSS
     || "https://www.goodreads.com/review/list_rss/173090020-marcus?shelf=read",
+  goodreadsReadingRss: process.env.GOODREADS_READING_RSS
+    || "https://www.goodreads.com/review/list_rss/173090020-marcus?shelf=currently-reading",
   letterboxdRss: process.env.LETTERBOXD_RSS
     || "https://letterboxd.com/wellactuarially/rss",
   traktClientId: process.env.TRAKT_CLIENT_ID || "",
@@ -33,6 +35,7 @@ const CONFIG = {
 
 const PROFILE_LINKS = {
   books: "https://www.goodreads.com/review/list/173090020-marcus?shelf=read",
+  reading: "https://www.goodreads.com/review/list/173090020-marcus?shelf=currently-reading",
   film: "https://letterboxd.com/wellactuarially/films/",
   tv: `https://trakt.tv/users/${CONFIG.traktUsername}/history/episodes`,
 };
@@ -123,6 +126,28 @@ async function fetchBooks() {
       creator: author,
       rating: Number.isFinite(r) && r > 0 ? r : null,
       note: review || "",
+      date: dateStr ? new Date(dateStr) : null,
+      link: tag(it, "link"),
+      image,
+    };
+  }).sort((a, b) => (b.date?.getTime() || 0) - (a.date?.getTime() || 0));
+}
+
+async function fetchReading() {
+  const xml = await getText(CONFIG.goodreadsReadingRss);
+  return items(xml).map((it) => {
+    const title = tag(it, "title");
+    const author = tag(it, "author_name");
+    const desc = tag(it, "description");
+    const coverMatch = desc.match(/<img[^>]+src="([^"]+)"/i);
+    const image = coverMatch ? coverMatch[1] : null;
+    const dateStr = tag(it, "pubDate");
+    return {
+      type: "reading",
+      title,
+      creator: author,
+      rating: null,
+      note: "",
       date: dateStr ? new Date(dateStr) : null,
       link: tag(it, "link"),
       image,
@@ -370,7 +395,7 @@ const STYLE = `<style>
 .ms-note{font-size:.85rem;color:var(--ms-dim);margin-top:.15rem;white-space:pre-wrap}
 .ms-error,.ms-empty{color:var(--ms-dim);font-style:italic}
 .ms-updated{font-size:.75rem;color:var(--ms-dim);margin-top:1rem}
-.ms-tabs{display:flex;gap:.5rem;margin:0 0 1.5rem;border-bottom:1px solid currentColor;position:sticky;top:0;background:#131517;z-index:10;padding-top:.5rem}
+.ms-tabs{display:flex;gap:.5rem;margin:0 0 1.5rem;border-bottom:1px solid currentColor;position:sticky;top:90px;background:#131517;z-index:1;padding-top:.5rem}
 .ms-tab{background:none;border:none;padding:.4rem .8rem;cursor:pointer;font:inherit;color:inherit;opacity:.55;border-bottom:2px solid transparent;margin-bottom:-1px}
 .ms-tab.is-active{opacity:1;border-bottom-color:currentColor;font-weight:600}
 .ms-section[data-tab]{display:none}
@@ -390,6 +415,7 @@ async function main() {
   console.log("Fetching sources...");
   const [books, film, tv] = await Promise.all([
     safe(fetchBooks),
+    safe(fetchReading),
     safe(fetchFilm),
     safe(fetchTv),
   ]);
@@ -402,13 +428,15 @@ async function main() {
 <div class="ms-stream">
   <div class="ms-tabs">
     <button class="ms-tab" data-target="books">Books</button>
+    <button class="ms-tab" data-target="reading">Reading Now</button>
     <button class="ms-tab" data-target="film">Films</button>
     <button class="ms-tab" data-target="tv">Television</button>
   </div>
-${renderSection("Reading", PROFILE_LINKS.books, books.data, books.error, "books")}
-${renderSection("Watching \u2014 Film", PROFILE_LINKS.film, film.data, film.error, "film")}
-${renderSection("Watching \u2014 TV", PROFILE_LINKS.tv, tv.data, tv.error, "tv", CONFIG.tvSection)}
-  <div class="ms-updated">Updated ${new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })} PT</div>
+${renderSection("Read", PROFILE_LINKS.books, books.data, books.error, "books")}
+${renderSection("Currently Reading", PROFILE_LINKS.reading, reading.data, reading.error, "reading")}
+${renderSection("Films", PROFILE_LINKS.film, film.data, film.error, "film")}
+${renderSection("TV", PROFILE_LINKS.tv, tv.data, tv.error, "tv", CONFIG.tvSection)}
+  <div class="ms-updated">Updated ${new Date().toLocaleDateString("en-US", { timeZone: "America/Los_Angeles" })} PT</div>
 </div>`;
 
   await writeFile("feed.html", html, "utf8");
