@@ -337,7 +337,7 @@ ${body}
 }
 
 const STYLE = `<style>
-.ms-stream{--ms-fg:inherit;--ms-dim:#e4e4e7;font-size:.95rem;line-height:1.4;white-space:pre-wrap}
+.ms-stream{--ms-fg:inherit;--ms-dim:#e4e4e7;font-size:.95rem;line-height:1.4}
 .ms-section{margin:0 0 2rem}
 .ms-heading{font-size:1.1rem;margin:0 0 .5rem;border-bottom:1px solid currentColor;padding-bottom:.25rem}
 .ms-heading a{text-decoration:none}
@@ -349,7 +349,7 @@ const STYLE = `<style>
 .ms-title:hover{text-decoration:underline}
 .ms-meta{margin-left:.5rem;color:var(--ms-dim)}
 .ms-date{display:block;font-size:.8rem;color:var(--ms-dim)}
-.ms-note{font-size:.85rem;color:var(--ms-dim);margin-top:.15rem}
+.ms-note{font-size:.85rem;color:var(--ms-dim);margin-top:.15rem;white-space:pre-wrap}
 .ms-error,.ms-empty{color:var(--ms-dim);font-style:italic}
 .ms-updated{font-size:.75rem;color:var(--ms-dim);margin-top:1rem}
 .ms-tabs{display:flex;gap:.5rem;margin:0 0 1.5rem;border-bottom:1px solid currentColor}
