@@ -146,6 +146,24 @@ async function fetchFilm() {
     })
     .filter(Boolean);
 }
+async function tmdbPoster(tmdbId) {
+  if (!CONFIG.tmdbToken || !tmdbId) return null;
+  try {
+    const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}`, {
+      headers: {
+        Authorization: `Bearer ${CONFIG.tmdbToken}`,
+        Accept: "application/json",
+      },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.poster_path
+      ? `https://image.tmdb.org/t/p/w92${data.poster_path}`
+      : null;
+  } catch {
+    return null;
+  }
+}
 
 async function fetchTv() {
   if (!CONFIG.traktClientId) {
@@ -159,8 +177,6 @@ async function fetchTv() {
       "Content-Type": "application/json",
       "trakt-api-version": "2",
       "trakt-api-key": CONFIG.traktClientId,
-      // Cloudflare (in front of Trakt) tends to block requests with no/odd
-      // User-Agent from datacenter IPs. Identify ourselves like a normal client.
       "User-Agent": "media-stream/1.0 (https://github.com/wellactuarially/website-feed)",
     },
   });
@@ -169,7 +185,7 @@ async function fetchTv() {
     throw new Error(`Trakt HTTP ${res.status} :: ${body}`);
   }
   const rows = await res.json();
-  return rows.map((row) => {
+  return Promise.all(rows.map(async (row) => {
     const show = row.show || {};
     const ep = row.episode || {};
     const showTitle = show.title || "Unknown show";
@@ -179,16 +195,18 @@ async function fetchTv() {
       title = `${showTitle} \u2014 ${code}`;
     }
     const slug = show.ids && show.ids.slug ? show.ids.slug : null;
+    const image = await tmdbPoster(show.ids && show.ids.tmdb);
     return {
       type: "tv",
       title,
       creator: ep.title || "",
-      rating: null, // history rows don't carry your rating; kept for shape parity
+      rating: null,
       note: "",
       date: row.watched_at ? new Date(row.watched_at) : null,
       link: slug ? `https://trakt.tv/shows/${slug}` : PROFILE_LINKS.tv,
+      image,
     };
-  });
+  }));
 }
 
 // ---- rendering --------------------------------------------------------------
