@@ -1,5 +1,5 @@
 <style>
-.ms-stream{--ms-fg:inherit;--ms-dim:#e4e4e7;font-size:.95rem;line-height:1.4;white-space:pre-wrap}
+.ms-stream{--ms-fg:inherit;--ms-dim:#e4e4e7;font-size:.95rem;line-height:1.4}
 .ms-section{margin:0 0 2rem}
 .ms-heading{font-size:1.1rem;margin:0 0 .5rem;border-bottom:1px solid currentColor;padding-bottom:.25rem}
 .ms-heading a{text-decoration:none}
@@ -11,10 +11,10 @@
 .ms-title:hover{text-decoration:underline}
 .ms-meta{margin-left:.5rem;color:var(--ms-dim)}
 .ms-date{display:block;font-size:.8rem;color:var(--ms-dim)}
-.ms-note{font-size:.85rem;color:var(--ms-dim);margin-top:.15rem}
+.ms-note{font-size:.85rem;color:var(--ms-dim);margin-top:.15rem;white-space:pre-wrap}
 .ms-error,.ms-empty{color:var(--ms-dim);font-style:italic}
 .ms-updated{font-size:.75rem;color:var(--ms-dim);margin-top:1rem}
-.ms-tabs{display:flex;gap:.5rem;margin:0 0 1.5rem;border-bottom:1px solid currentColor}
+.ms-tabs{display:flex;gap:.5rem;margin:0 0 1.5rem;border-bottom:1px solid currentColor;position:sticky;top:0;background:#131517;z-index:10;padding-top:.5rem}
 .ms-tab{background:none;border:none;padding:.4rem .8rem;cursor:pointer;font:inherit;color:inherit;opacity:.55;border-bottom:2px solid transparent;margin-bottom:-1px}
 .ms-tab.is-active{opacity:1;border-bottom-color:currentColor;font-weight:600}
 .ms-section[data-tab]{display:none}
@@ -30,21 +30,23 @@
     <h2 class="ms-heading"><a href="https://www.goodreads.com/review/list/173090020-marcus?shelf=read">Reading</a></h2>
     <ul class="ms-list">
       <li class="ms-item">
+        <img class="ms-cover" src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1664729357l/62848145._SY75_.jpg" alt="" loading="lazy" />
+        <div class="ms-item-body">
+          <a class="ms-title" href="https://www.goodreads.com/review/show/8628693322?utm_medium=api&amp;utm_source=rss">The Housemaid's Secret (The Housemaid, #2)</a>
+          <span class="ms-meta">Freida McFadden · ★★★★</span>
+          <span class="ms-date">May 31, 2026</span>
+          <div class="ms-note">Millie is a fun character and this is a fun series. Millie seems to meet a lot of people who are up to some kind of nonsense.
+
+Listened to this as an audiobook and as far as audiobooks go this is by far one of the better ones. The writing style in this series is plain and conversational (which I quite liked) and it made the story very easy to follow.</div>
+        </div>
+      </li>
+      <li class="ms-item">
         <img class="ms-cover" src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1594618538l/52716713._SY75_.jpg" alt="" loading="lazy" />
         <div class="ms-item-body">
           <a class="ms-title" href="https://www.goodreads.com/review/show/8623654770?utm_medium=api&amp;utm_source=rss">First Steps: How Upright Walking Made Us Human</a>
           <span class="ms-meta">Jeremy Desilva · ★★★★</span>
           <span class="ms-date">May 24, 2026</span>
           <div class="ms-note">Pretty good and though I enjoyed the ride, maybe I should've written some stuff down because I feel like I have basically no memory of the technical details.</div>
-        </div>
-      </li>
-      <li class="ms-item">
-        <img class="ms-cover" src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1664729357l/62848145._SY75_.jpg" alt="" loading="lazy" />
-        <div class="ms-item-body">
-          <a class="ms-title" href="https://www.goodreads.com/review/show/8628693322?utm_medium=api&amp;utm_source=rss">The Housemaid's Secret (The Housemaid, #2)</a>
-          <span class="ms-meta">Freida McFadden · ★★★★</span>
-          <span class="ms-date">May 31, 2026</span>
-          <div class="ms-note">Millie is a fun character and this is a fun series. Millie seems to meet a lot of people who are up to some kind of nonsense. Listened to this as an audiobook and as far as audiobooks go this is by far one of the better ones. The writing style in this series is plain and conversational (which I quite liked) and it made the story very easy to follow.</div>
         </div>
       </li>
       <li class="ms-item">
@@ -62,7 +64,15 @@
           <a class="ms-title" href="https://www.goodreads.com/review/show/8561493869?utm_medium=api&amp;utm_source=rss">Introductory Time Series with R (Use R!)</a>
           <span class="ms-meta">Paul S.P. Cowpertwait · ★★★★</span>
           <span class="ms-date">Apr 28, 2026</span>
-          <div class="ms-note">This is a good book to get you started on time series. It does what it wants to do well and in short time. The book can be pretty brief, which is a strength and a weakness I think. Sometimes glossing over things maybe a bit too quick for me. It's probably more of a strength than a weakness, this is really intended as an introduction and doesn't seek to be too comprehensive. Clearly written and a pretty enjoyable read for a text on coding and math. A couple notes: - I cannot comment on the quality of any code as I am by no means an expert myself, maybe I'll come back to this someday. - I have not read this book in its entirety — the last three chapters are not required for my upcoming exam. I might just come back to those last three chapters at some point too.</div>
+          <div class="ms-note">This is a good book to get you started on time series. It does what it wants to do well and in short time.
+
+The book can be pretty brief, which is a strength and a weakness I think. Sometimes glossing over things maybe a bit too quick for me. It's probably more of a strength than a weakness, this is really intended as an introduction and doesn't seek to be too comprehensive.
+
+Clearly written and a pretty enjoyable read for a text on coding and math.
+
+A couple notes:
+- I cannot comment on the quality of any code as I am by no means an expert myself, maybe I'll come back to this someday.
+- I have not read this book in its entirety — the last three chapters are not required for my upcoming exam. I might just come back to those last three chapters at some point too.</div>
         </div>
       </li>
       <li class="ms-item">
@@ -71,7 +81,13 @@
           <a class="ms-title" href="https://www.goodreads.com/review/show/8561476674?utm_medium=api&amp;utm_source=rss">Linear Mixed Models: A Practical Guide Using Statistical Software</a>
           <span class="ms-meta">Brady T. West · ★★★</span>
           <span class="ms-date">Apr 26, 2026</span>
-          <div class="ms-note">I'm of two minds on how to rate this. On the one hand the writing is very clear, the book is extensive in its examples and discussion of the differences in statistical software. And I might have liked the book more if I actually needed any of the software in this book other than R. My low rating is largely due to the lack of practice problems at all. I think it is strange to have a technical book without any problem set whatsoever. I do not expect the book to have problems for doing the math per se, that is not really what the book is about. But the book would benefit greatly from very short &quot;Check your understanding problems&quot; or some high quality true or false questions. The chapter summaries are really halfhearted and hardly touch on any of the important topics discussed in the book. The authors are very knowledgeable and I've learned a lot from reading this book. I just wish they had made it easier for me to do so!</div>
+          <div class="ms-note">I'm of two minds on how to rate this. On the one hand the writing is very clear, the book is extensive in its examples and discussion of the differences in statistical software. And I might have liked the book more if I actually needed any of the software in this book other than R.
+
+My low rating is largely due to the lack of practice problems at all. I think it is strange to have a technical book without any problem set whatsoever. I do not expect the book to have problems for doing the math per se, that is not really what the book is about. But the book would benefit greatly from very short &quot;Check your understanding problems&quot; or some high quality true or false questions.
+
+The chapter summaries are really halfhearted and hardly touch on any of the important topics discussed in the book.
+
+The authors are very knowledgeable and I've learned a lot from reading this book. I just wish they had made it easier for me to do so!</div>
         </div>
       </li>
       <li class="ms-item">
@@ -80,7 +96,9 @@
           <a class="ms-title" href="https://www.goodreads.com/review/show/8504054537?utm_medium=api&amp;utm_source=rss">Katabasis</a>
           <span class="ms-meta">R.F. Kuang · ★★★</span>
           <span class="ms-date">Apr 26, 2026</span>
-          <div class="ms-note">I really liked the characters — good, bad, and grey — and R.F. Kuang is a really good writer. I really enjoyed the prose and I do intend to read more by her. The way magic works in this book is full of great references for nerds like me. And I've got to read Wittgenstein. I'm probably rounding down my review a little bit, but two glaring things dragged this down for me. The latter half of the book dragged and I don't think there really was much meat to hell itself. I do think if someone is going to write about hell and resurrection, there should be a bit more to it. But it just felt thin.</div>
+          <div class="ms-note">I really liked the characters — good, bad, and grey — and R.F. Kuang is a really good writer. I really enjoyed the prose and I do intend to read more by her. The way magic works in this book is full of great references for nerds like me. And I've got to read Wittgenstein.
+
+I'm probably rounding down my review a little bit, but two glaring things dragged this down for me. The latter half of the book dragged and I don't think there really was much meat to hell itself. I do think if someone is going to write about hell and resurrection, there should be a bit more to it. But it just felt thin.</div>
         </div>
       </li>
       <li class="ms-item">
@@ -93,30 +111,42 @@
         </div>
       </li>
       <li class="ms-item">
+        <img class="ms-cover" src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1764703833l/54493401._SY75_.jpg" alt="" loading="lazy" />
+        <div class="ms-item-body">
+          <a class="ms-title" href="https://www.goodreads.com/review/show/7835232434?utm_medium=api&amp;utm_source=rss">Project Hail Mary</a>
+          <span class="ms-meta">Andy Weir · ★★★★</span>
+          <span class="ms-date">Apr 14, 2026</span>
+          <div class="ms-note">The science writing in this book is awesome. When Weir is writing about science, everything flows spectacularly.
+
+The two main characters in this book are great, in Andy Weir style Dr. Grace is a cornball and it had me rolling my eyes at times, but that comes with the cornball territory.
+
+Some spoilers for the middle of the book: [spoilers removed]
+
+Some spoilers for the end: [spoilers removed]
+
+Glad I read the book, very excited for the movie!</div>
+        </div>
+      </li>
+      <li class="ms-item">
+        <img class="ms-cover" src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1738617234l/222631674._SY75_.jpg" alt="" loading="lazy" />
+        <div class="ms-item-body">
+          <a class="ms-title" href="https://www.goodreads.com/review/show/8055804674?utm_medium=api&amp;utm_source=rss">The Elements (The Elements, #1-4)</a>
+          <span class="ms-meta">John Boyne · ★★★★★</span>
+          <span class="ms-date">Apr 6, 2026</span>
+          <div class="ms-note">The Elements is one of the most beautiful books I've ever read. The prose is immaculate, the story flows smoothly, and with every twist and turn in the story it's as if John Boyne tells you that he is playing with your feelings but you relish it all the same. I feel now like I know many of the characters and that I want them to find peace in their own way. And even if a character's journey is not explicitly in the pages I'd like to imagine that they found their peace.
+
+The book poses a few simple questions, a few of which come to mind: How do we handle our trauma? Should we let it take over our lives, lash out, become self-destructive, recoil from the ones we love? Do we just do our best to soldier on? Do we let others help us heal? One question posed directly in the book has been nagging at me: Is it easy to live without a conscience? At this moment my answer would be that it's harder in the short run but easier in the long run. Surely building up others is better for our soul than tearing others down.
+
+Wow what a beautiful book. Highly highly recommend this masterpiece.</div>
+        </div>
+      </li>
+      <li class="ms-item">
         <img class="ms-cover" src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1385132472l/17397466._SX50_.jpg" alt="" loading="lazy" />
         <div class="ms-item-body">
           <a class="ms-title" href="https://www.goodreads.com/review/show/8550958722?utm_medium=api&amp;utm_source=rss">An Introduction to Statistical Learning: with Applications in R (Springer Texts in Statistics)</a>
           <span class="ms-meta">Gareth James · ★★★★★</span>
           <span class="ms-date">Mar 5, 2026</span>
           <div class="ms-note">This book is just awesome. It is very clearly written has some beautiful graphics that make clear everything the authors discuss. I wish more writing on mathematics and statistics was as clear as this. More and more I feel I am mastering statistical learning, and it is in large part due to the clarity of this book.</div>
-        </div>
-      </li>
-      <li class="ms-item">
-        <img class="ms-cover" src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1764703833l/54493401._SY75_.jpg" alt="" loading="lazy" />
-        <div class="ms-item-body">
-          <a class="ms-title" href="https://www.goodreads.com/review/show/7835232434?utm_medium=api&amp;utm_source=rss">Project Hail Mary</a>
-          <span class="ms-meta">Andy Weir · ★★★★</span>
-          <span class="ms-date">Apr 14, 2026</span>
-          <div class="ms-note">The science writing in this book is awesome. When Weir is writing about science, everything flows spectacularly. The two main characters in this book are great, in Andy Weir style Dr. Grace is a cornball and it had me rolling my eyes at times, but that comes with the cornball territory. Some spoilers for the middle of the book: [spoilers removed] Some spoilers for the end: [spoilers removed] Glad I read the book, very excited for the movie!</div>
-        </div>
-      </li>
-      <li class="ms-item">
-        <img class="ms-cover" src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1599911216l/49021976._SY75_.jpg" alt="" loading="lazy" />
-        <div class="ms-item-body">
-          <a class="ms-title" href="https://www.goodreads.com/review/show/7604124349?utm_medium=api&amp;utm_source=rss">Rhythm of War (The Stormlight Archive, #4)</a>
-          <span class="ms-meta">Brandon Sanderson · ★★★★★</span>
-          <span class="ms-date">Jul 10, 2025</span>
-          
         </div>
       </li>
     </ul>
@@ -130,7 +160,9 @@
           <a class="ms-title" href="https://letterboxd.com/wellactuarially/film/the-devil-wears-prada-2/">The Devil Wears Prada 2 (2026)</a>
           <span class="ms-meta">★★★½</span>
           <span class="ms-date">May 30, 2026</span>
-          <div class="ms-note">I liked it a lot. A nice feel good movie and I don't have a lot to add. Obviously great cast and hits all the emotional notes it is trying to. A bone to pick, which I tried to not let get to me too much, was Andy Sachs going on about &quot;greedy developers&quot; and how &quot;luxury apartments&quot; aren't as essential as journalism. Andy, what are you talking about, you LIVE in that apartment. Are you saying a place to live is not as essential as journalism? Go back to living in your apartment that needs a great many repairs or go live in a mud hut.</div>
+          <div class="ms-note">I liked it a lot. A nice feel good movie and I don't have a lot to add. Obviously great cast and hits all the emotional notes it is trying to.
+
+A bone to pick, which I tried to not let get to me too much, was Andy Sachs going on about &quot;greedy developers&quot; and how &quot;luxury apartments&quot; aren't as essential as journalism. Andy, what are you talking about, you LIVE in that apartment. Are you saying a place to live is not as essential as journalism? Go back to living in your apartment that needs a great many repairs or go live in a mud hut.</div>
         </div>
       </li>
       <li class="ms-item">
@@ -230,5 +262,5 @@
       </li>
     </ul>
   </section>
-  <div class="ms-updated">Updated 6/3/2026, 6:36:41 PM PT</div>
+  <div class="ms-updated">Updated 6/3/2026, 9:22:03 PM PT</div>
 </div>
