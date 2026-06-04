@@ -1,5 +1,5 @@
 <style>
-.ms-stream{--ms-fg:inherit;--ms-dim:#888;font-size:.95rem;line-height:1.4}
+.ms-stream{--ms-fg:inherit;--ms-dim:#e4e4e7;font-size:.95rem;line-height:1.4;white-space:pre-wrap}
 .ms-section{margin:0 0 2rem}
 .ms-heading{font-size:1.1rem;margin:0 0 .5rem;border-bottom:1px solid currentColor;padding-bottom:.25rem}
 .ms-heading a{text-decoration:none}
@@ -14,11 +14,30 @@
 .ms-note{font-size:.85rem;color:var(--ms-dim);margin-top:.15rem}
 .ms-error,.ms-empty{color:var(--ms-dim);font-style:italic}
 .ms-updated{font-size:.75rem;color:var(--ms-dim);margin-top:1rem}
+.ms-tabs{display:flex;gap:.5rem;margin:0 0 1.5rem;border-bottom:1px solid currentColor}
+.ms-tab{background:none;border:none;padding:.4rem .8rem;cursor:pointer;font:inherit;color:inherit;opacity:.55;border-bottom:2px solid transparent;margin-bottom:-1px}
+.ms-tab.is-active{opacity:1;border-bottom-color:currentColor;font-weight:600}
+.ms-section[data-tab]{display:none}
+.ms-section.is-active{display:block}
 </style>
 <div class="ms-stream">
-  <section class="ms-section">
+  <div class="ms-tabs">
+    <button class="ms-tab" data-target="books">Books</button>
+    <button class="ms-tab" data-target="film">Films</button>
+    <button class="ms-tab" data-target="tv">Television</button>
+  </div>
+  <section class="ms-section" data-tab="books">
     <h2 class="ms-heading"><a href="https://www.goodreads.com/review/list/173090020-marcus?shelf=read">Reading</a></h2>
     <ul class="ms-list">
+      <li class="ms-item">
+        <img class="ms-cover" src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1594618538l/52716713._SY75_.jpg" alt="" loading="lazy" />
+        <div class="ms-item-body">
+          <a class="ms-title" href="https://www.goodreads.com/review/show/8623654770?utm_medium=api&amp;utm_source=rss">First Steps: How Upright Walking Made Us Human</a>
+          <span class="ms-meta">Jeremy Desilva · ★★★★</span>
+          <span class="ms-date">May 24, 2026</span>
+          <div class="ms-note">Pretty good and though I enjoyed the ride, maybe I should've written some stuff down because I feel like I have basically no memory of the technical details.</div>
+        </div>
+      </li>
       <li class="ms-item">
         <img class="ms-cover" src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1664729357l/62848145._SY75_.jpg" alt="" loading="lazy" />
         <div class="ms-item-body">
@@ -26,15 +45,6 @@
           <span class="ms-meta">Freida McFadden · ★★★★</span>
           <span class="ms-date">May 31, 2026</span>
           <div class="ms-note">Millie is a fun character and this is a fun series. Millie seems to meet a lot of people who are up to some kind of nonsense. Listened to this as an audiobook and as far as audiobooks go this is by far one of the better ones. The writing style in this series is plain and conversational (which I quite liked) and it made the story very easy to follow.</div>
-        </div>
-      </li>
-      <li class="ms-item">
-        <img class="ms-cover" src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1594618538l/52716713._SY75_.jpg" alt="" loading="lazy" />
-        <div class="ms-item-body">
-          <a class="ms-title" href="https://www.goodreads.com/review/show/8623654770?utm_medium=api&amp;utm_source=rss">First Steps: How Upright Walking Made Us Human</a>
-          <span class="ms-meta">Jeremy Desilva</span>
-          <span class="ms-date">May 24, 2026</span>
-          
         </div>
       </li>
       <li class="ms-item">
@@ -111,7 +121,7 @@
       </li>
     </ul>
   </section>
-  <section class="ms-section">
+  <section class="ms-section" data-tab="film">
     <h2 class="ms-heading"><a href="https://letterboxd.com/wellactuarially/films/">Watching — Film</a></h2>
     <ul class="ms-list">
       <li class="ms-item">
@@ -206,7 +216,7 @@
       </li>
     </ul>
   </section>
-  <section class="ms-section">
+  <section class="ms-section" data-tab="tv">
     <h2 class="ms-heading"><a href="https://trakt.tv/users/wellactuarially/history/episodes">Watching — TV</a></h2>
     <ul class="ms-list">
       <li class="ms-item">
@@ -220,5 +230,5 @@
       </li>
     </ul>
   </section>
-  <div class="ms-updated">Updated 6/3/2026, 5:31:30 PM PT</div>
+  <div class="ms-updated">Updated 6/3/2026, 6:32:22 PM PT</div>
 </div>
