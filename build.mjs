@@ -167,36 +167,35 @@ async function tmdbPoster(tmdbId) {
 
 async function fetchTvNotes() {
   if (!CONFIG.traktClientId) return {};
+  const map = {};
+  const headers = {
+    "Content-Type": "application/json",
+    "trakt-api-version": "2",
+    "trakt-api-key": CONFIG.traktClientId,
+    "User-Agent": "media-stream/1.0 (https://github.com/wellactuarially/website-feed)",
+  };
   try {
-    const res = await fetch(
-      `https://api.trakt.tv/users/${CONFIG.traktUsername}/notes?limit=100`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "trakt-api-version": "2",
-          "trakt-api-key": CONFIG.traktClientId,
-          "User-Agent": "media-stream/1.0 (https://github.com/wellactuarially/website-feed)",
-        },
+    for (let page = 1; page <= 20; page++) {   // safety cap: 20 pages = 2000 notes
+      const res = await fetch(
+        `https://api.trakt.tv/users/${CONFIG.traktUsername}/notes?limit=100&page=${page}`,
+        { headers }
+      );
+      if (!res.ok) break;
+      const rows = await res.json();
+      if (!rows.length) break;                 // no more pages
+      for (const row of rows) {
+        if (
+          row.type === "episode" &&
+          row.note && row.note.privacy === "public" &&
+          row.episode && row.episode.ids && row.episode.ids.trakt != null
+        ) {
+          map[row.episode.ids.trakt] = row.note.notes || "";
+        }
       }
-    );
-    if (!res.ok) return {};
-    const rows = await res.json();
-    const map = {};
-    for (const row of rows) {
-      // Only public episode notes, keyed by episode Trakt id.
-      if (
-        row.type === "episode" &&
-        row.note &&
-        row.note.privacy === "public" &&
-        row.episode && row.episode.ids && row.episode.ids.trakt != null
-      ) {
-        map[row.episode.ids.trakt] = row.note.notes || "";
-      }
+      if (rows.length < 100) break;            // last page was partial → done
     }
-    return map;
-  } catch {
-    return {};
-  }
+  } catch { /* fall through with whatever we have */ }
+  return map;
 }
 
 async function fetchTv() {
@@ -219,6 +218,7 @@ async function fetchTv() {
     throw new Error(`Trakt HTTP ${res.status} :: ${body}`);
   }
   const rows = await res.json();
+  const notesMap = await fetchTvNotes(); 
   return Promise.all(rows.map(async (row) => {
     const show = row.show || {};
     const ep = row.episode || {};
@@ -230,12 +230,14 @@ async function fetchTv() {
     }
     const slug = show.ids && show.ids.slug ? show.ids.slug : null;
     const image = await tmdbPoster(show.ids && show.ids.tmdb);
+    const epId = ep.ids && ep.ids.trakt;
+    const note = epId != null ? (notesMap[epId] || "") : "";
     return {
       type: "tv",
       title,
       creator: ep.title || "",
       rating: null,
-      note: "",
+      note,
       date: row.watched_at ? new Date(row.watched_at) : null,
       link: slug ? `https://trakt.tv/shows/${slug}` : PROFILE_LINKS.tv,
       image,
