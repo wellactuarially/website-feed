@@ -165,6 +165,40 @@ async function tmdbPoster(tmdbId) {
   }
 }
 
+async function fetchTvNotes() {
+  if (!CONFIG.traktClientId) return {};
+  try {
+    const res = await fetch(
+      `https://api.trakt.tv/users/${CONFIG.traktUsername}/notes?limit=100`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "trakt-api-version": "2",
+          "trakt-api-key": CONFIG.traktClientId,
+          "User-Agent": "media-stream/1.0 (https://github.com/wellactuarially/website-feed)",
+        },
+      }
+    );
+    if (!res.ok) return {};
+    const rows = await res.json();
+    const map = {};
+    for (const row of rows) {
+      // Only public episode notes, keyed by episode Trakt id.
+      if (
+        row.type === "episode" &&
+        row.note &&
+        row.note.privacy === "public" &&
+        row.episode && row.episode.ids && row.episode.ids.trakt != null
+      ) {
+        map[row.episode.ids.trakt] = row.note.notes || "";
+      }
+    }
+    return map;
+  } catch {
+    return {};
+  }
+}
+
 async function fetchTv() {
   if (!CONFIG.traktClientId) {
     throw new Error("TRAKT_CLIENT_ID not set");
