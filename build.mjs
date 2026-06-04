@@ -413,7 +413,7 @@ async function safe(fn) {
 
 async function main() {
   console.log("Fetching sources...");
-  const [books, film, tv] = await Promise.all([
+  const [books, reading, film, tv] = await Promise.all([
     safe(fetchBooks),
     safe(fetchReading),
     safe(fetchFilm),
