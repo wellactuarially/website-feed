@@ -198,6 +198,36 @@ async function fetchTvNotes() {
   return map;
 }
 
+async function fetchTvRatings() {
+  if (!CONFIG.traktClientId) return {};
+  const map = {};
+  const headers = {
+    "Content-Type": "application/json",
+    "trakt-api-version": "2",
+    "trakt-api-key": CONFIG.traktClientId,
+    "User-Agent": "media-stream/1.0 (https://github.com/wellactuarially/website-feed)",
+  };
+  try {
+    for (let page = 1; page <= 20; page++) {
+      const res = await fetch(
+        `https://api.trakt.tv/users/${CONFIG.traktUsername}/ratings/episodes?limit=100&page=${page}`,
+        { headers }
+      );
+      if (!res.ok) break;
+      const rows = await res.json();
+      if (!rows.length) break;
+      for (const row of rows) {
+        const id = row.episode && row.episode.ids && row.episode.ids.trakt;
+        if (id != null && row.rating != null) {
+          map[id] = row.rating / 2;   // Trakt 0–10 → 0–5 star scale
+        }
+      }
+      if (rows.length < 100) break;
+    }
+  } catch { /* fall through */ }
+  return map;
+}
+
 async function fetchTv() {
   if (!CONFIG.traktClientId) {
     throw new Error("TRAKT_CLIENT_ID not set");
@@ -218,7 +248,8 @@ async function fetchTv() {
     throw new Error(`Trakt HTTP ${res.status} :: ${body}`);
   }
   const rows = await res.json();
-  const notesMap = await fetchTvNotes(); 
+  const notesMap = await fetchTvNotes();
+  const ratingsMap = await fetchTvRatings();
   return Promise.all(rows.map(async (row) => {
     const show = row.show || {};
     const ep = row.episode || {};
@@ -232,11 +263,12 @@ async function fetchTv() {
     const image = await tmdbPoster(show.ids && show.ids.tmdb);
     const epId = ep.ids && ep.ids.trakt;
     const note = epId != null ? (notesMap[epId] || "") : "";
+    const rating = epId != null ? (ratingsMap[epId] ?? null) : null;
     return {
       type: "tv",
       title,
       creator: ep.title || "",
-      rating: null,
+      rating,
       note,
       date: row.watched_at ? new Date(row.watched_at) : null,
       link: slug ? `https://trakt.tv/shows/${slug}` : PROFILE_LINKS.tv,
