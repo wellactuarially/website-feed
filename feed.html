@@ -14,7 +14,7 @@
 .ms-note{font-size:.85rem;color:var(--ms-dim);margin-top:.15rem;white-space:pre-wrap}
 .ms-error,.ms-empty{color:var(--ms-dim);font-style:italic}
 .ms-updated{font-size:.75rem;color:var(--ms-dim);margin-top:1rem}
-.ms-tabs{display:flex;gap:.5rem;margin:0 0 1.5rem;border-bottom:1px solid currentColor;position:sticky;top:0;background:#131517;z-index:10;padding-top:.5rem}
+.ms-tabs{display:flex;gap:.5rem;margin:0 0 1.5rem;border-bottom:1px solid currentColor;position:sticky;top:90px;background:#131517;z-index:1;padding-top:.5rem}
 .ms-tab{background:none;border:none;padding:.4rem .8rem;cursor:pointer;font:inherit;color:inherit;opacity:.55;border-bottom:2px solid transparent;margin-bottom:-1px}
 .ms-tab.is-active{opacity:1;border-bottom-color:currentColor;font-weight:600}
 .ms-section[data-tab]{display:none}
@@ -23,11 +23,12 @@
 <div class="ms-stream">
   <div class="ms-tabs">
     <button class="ms-tab" data-target="books">Books</button>
+    <button class="ms-tab" data-target="reading">Reading Now</button>
     <button class="ms-tab" data-target="film">Films</button>
     <button class="ms-tab" data-target="tv">Television</button>
   </div>
   <section class="ms-section" data-tab="books">
-    <h2 class="ms-heading"><a href="https://www.goodreads.com/review/list/173090020-marcus?shelf=read">Reading</a></h2>
+    <h2 class="ms-heading"><a href="https://www.goodreads.com/review/list/173090020-marcus?shelf=read">Read</a></h2>
     <ul class="ms-list">
       <li class="ms-item">
         <img class="ms-cover" src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1664729357l/62848145._SY75_.jpg" alt="" loading="lazy" />
@@ -151,8 +152,40 @@ Wow what a beautiful book. Highly highly recommend this masterpiece.</div>
       </li>
     </ul>
   </section>
+  <section class="ms-section" data-tab="reading">
+    <h2 class="ms-heading"><a href="https://www.goodreads.com/review/list/173090020-marcus?shelf=currently-reading">Currently Reading</a></h2>
+    <ul class="ms-list">
+      <li class="ms-item">
+        <img class="ms-cover" src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1710781474l/199235727._SY75_.jpg" alt="" loading="lazy" />
+        <div class="ms-item-body">
+          <a class="ms-title" href="https://www.goodreads.com/review/show/8656514163?utm_medium=api&amp;utm_source=rss">The Housemaid is Watching (The Housemaid, #3)</a>
+          <span class="ms-meta">Freida McFadden</span>
+          <span class="ms-date">Jun 3, 2026</span>
+          
+        </div>
+      </li>
+      <li class="ms-item">
+        <img class="ms-cover" src="https://s.gr-assets.com/assets/nophoto/book/50x75-1b903c9eac1b2ba789662c08a0ae41e6.png" alt="" loading="lazy" />
+        <div class="ms-item-body">
+          <a class="ms-title" href="https://www.goodreads.com/review/show/8551766873?utm_medium=api&amp;utm_source=rss">Basic Ratemaking</a>
+          <span class="ms-meta">Geoff Werner</span>
+          <span class="ms-date">Apr 26, 2026</span>
+          
+        </div>
+      </li>
+      <li class="ms-item">
+        <img class="ms-cover" src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1761312598l/61431922._SY75_.jpg" alt="" loading="lazy" />
+        <div class="ms-item-body">
+          <a class="ms-title" href="https://www.goodreads.com/review/show/7043799307?utm_medium=api&amp;utm_source=rss">Fourth Wing (The Empyrean, #1)</a>
+          <span class="ms-meta">Rebecca Yarros</span>
+          <span class="ms-date">Apr 23, 2026</span>
+          
+        </div>
+      </li>
+    </ul>
+  </section>
   <section class="ms-section" data-tab="film">
-    <h2 class="ms-heading"><a href="https://letterboxd.com/wellactuarially/films/">Watching — Film</a></h2>
+    <h2 class="ms-heading"><a href="https://letterboxd.com/wellactuarially/films/">Films</a></h2>
     <ul class="ms-list">
       <li class="ms-item">
         <img class="ms-cover" src="https://a.ltrbxd.com/resized/film-poster/1/1/9/5/5/8/6/1195586-the-devil-wears-prada-2-0-600-0-900-crop.jpg?v=0d955add69" alt="" loading="lazy" />
@@ -249,7 +282,7 @@ A bone to pick, which I tried to not let get to me too much, was Andy Sachs goin
     </ul>
   </section>
   <section class="ms-section" data-tab="tv">
-    <h2 class="ms-heading"><a href="https://trakt.tv/users/wellactuarially/history/episodes">Watching — TV</a></h2>
+    <h2 class="ms-heading"><a href="https://trakt.tv/users/wellactuarially/history/episodes">TV</a></h2>
     <ul class="ms-list">
       <li class="ms-item">
         <img class="ms-cover" src="https://image.tmdb.org/t/p/w92/5lcxWLVAEICkFpuAiV1aMy7ZZj3.jpg" alt="" loading="lazy" />
@@ -262,5 +295,5 @@ A bone to pick, which I tried to not let get to me too much, was Andy Sachs goin
       </li>
     </ul>
   </section>
-  <div class="ms-updated">Updated 6/3/2026, 9:22:03 PM PT</div>
+  <div class="ms-updated">Updated 6/3/2026 PT</div>
 </div>
