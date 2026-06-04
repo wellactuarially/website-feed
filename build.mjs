@@ -237,11 +237,17 @@ function renderItem(it) {
   const meta = [it.creator, rate].filter(Boolean).join(" \u00b7 ");
   const date = fmtDate(it.date);
   const note = it.note ? `<div class="ms-note">${escapeHtml(it.note)}</div>` : "";
+  const cover = it.image
+    ? `<img class="ms-cover" src="${escapeHtml(it.image)}" alt="" loading="lazy" />`
+    : "";
   return `      <li class="ms-item">
-        <a class="ms-title" href="${escapeHtml(it.link)}">${escapeHtml(it.title)}</a>
-        ${meta ? `<span class="ms-meta">${escapeHtml(meta)}</span>` : ""}
-        ${date ? `<span class="ms-date">${escapeHtml(date)}</span>` : ""}
-        ${note}
+        ${cover}
+        <div class="ms-item-body">
+          <a class="ms-title" href="${escapeHtml(it.link)}">${escapeHtml(it.title)}</a>
+          ${meta ? `<span class="ms-meta">${escapeHtml(meta)}</span>` : ""}
+          ${date ? `<span class="ms-date">${escapeHtml(date)}</span>` : ""}
+          ${note}
+        </div>
       </li>`;
 }
 
@@ -268,7 +274,9 @@ const STYLE = `<style>
 .ms-heading{font-size:1.1rem;margin:0 0 .5rem;border-bottom:1px solid currentColor;padding-bottom:.25rem}
 .ms-heading a{text-decoration:none}
 .ms-list{list-style:none;margin:0;padding:0}
-.ms-item{margin:0 0 .75rem}
+.ms-item{margin:0 0 1rem;display:flex;gap:.6rem;align-items:flex-start}
+.ms-cover{width:46px;height:auto;border-radius:3px;flex:0 0 auto}
+.ms-item-body{flex:1;min-width:0}
 .ms-title{font-weight:600;text-decoration:none}
 .ms-title:hover{text-decoration:underline}
 .ms-meta{margin-left:.5rem;color:var(--ms-dim)}
