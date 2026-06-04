@@ -28,6 +28,7 @@ const CONFIG = {
   traktUsername: process.env.TRAKT_USERNAME || "wellactuarially",
   tmdbToken: process.env.TMDB_TOKEN || "",
   perSection: 10,
+  tvSection: 25,
 };
 
 const PROFILE_LINKS = {
@@ -56,6 +57,23 @@ function decodeEntities(s) {
 // Strip HTML tags (used for review/notes snippets where we just want text).
 function stripTags(s) {
   return decodeEntities((s || "").replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
+}
+
+// Like stripTags, but preserves paragraph/line breaks as newlines.
+// Used for review/note text where structure matters.
+function stripTagsKeepBreaks(s) {
+  if (!s) return "";
+  let t = s
+    .replace(/<\s*br\s*\/?>/gi, "\n")       // <br> → newline
+    .replace(/<\/\s*p\s*>/gi, "\n\n")        // </p> → blank line
+    .replace(/<[^>]+>/g, "");                // drop all other tags
+  t = decodeEntities(t);
+  // Collapse runs of spaces/tabs, but keep newlines. Trim trailing space per line.
+  t = t.replace(/[ \t]+/g, " ")
+       .replace(/ *\n */g, "\n")             // tidy space around newlines
+       .replace(/\n{3,}/g, "\n\n")           // cap blank runs at one
+       .trim();
+  return t;
 }
 
 // Pull the inner text of the FIRST <tag>...</tag> inside a chunk.
@@ -94,7 +112,7 @@ async function fetchBooks() {
     const title = tag(it, "title");
     const author = tag(it, "author_name");
     const r = parseInt(tag(it, "user_rating"), 10);
-    const review = stripTags(tag(it, "user_review"));
+    const review = stripTagsKeepBreaks(tag(it, "user_review"));
     const desc = tag(it, "description");
     const coverMatch = desc.match(/<img[^>]+src="([^"]+)"/i);
     const image = coverMatch ? coverMatch[1] : null;
@@ -109,7 +127,7 @@ async function fetchBooks() {
       link: tag(it, "link"),
       image,
     };
-  });
+  }).sort((a, b) => (b.date?.getTime() || 0) - (a.date?.getTime() || 0));
 }
 
 async function fetchFilm() {
@@ -128,7 +146,7 @@ async function fetchFilm() {
       const rawDesc = tag(it, "description");
       const imgMatch = rawDesc.match(/<img[^>]+src="([^"]+)"/i);
       const image = imgMatch ? imgMatch[1] : null;
-      const review = stripTags(rawDesc);
+      const review = stripTagsKeepBreaks(rawDesc);
       // watchedDate is the diary date; fall back to pubDate.
       const dateStr = tag(it, "letterboxd:watchedDate") || tag(it, "pubDate");
       return {
@@ -234,7 +252,7 @@ async function fetchTv() {
   }
   const url =
     `https://api.trakt.tv/users/${CONFIG.traktUsername}/history/shows`
-    + `?limit=${CONFIG.perSection}`;
+    + `?limit=${CONFIG.tvSection}`;
   const res = await fetch(url, {
     headers: {
       "Content-Type": "application/json",
@@ -319,14 +337,14 @@ function renderItem(it) {
       </li>`;
 }
 
-function renderSection(label, profileUrl, list, error, tabId) {
+function renderSection(label, profileUrl, list, error, tabId, limit = COFING.perSection) {
   let body;
   if (error) {
     body = `      <li class="ms-error">Couldn\u2019t load right now.</li>`;
   } else if (!list || list.length === 0) {
     body = `      <li class="ms-empty">Nothing recent.</li>`;
   } else {
-    body = list.slice(0, CONFIG.perSection).map(renderItem).join("\n");
+    body = list.slice(0, limit).map(renderItem).join("\n");
   }
   return `  <section class="ms-section" data-tab="${tabId}">
     <h2 class="ms-heading"><a href="${escapeHtml(profileUrl)}">${escapeHtml(label)}</a></h2>
@@ -352,7 +370,7 @@ const STYLE = `<style>
 .ms-note{font-size:.85rem;color:var(--ms-dim);margin-top:.15rem;white-space:pre-wrap}
 .ms-error,.ms-empty{color:var(--ms-dim);font-style:italic}
 .ms-updated{font-size:.75rem;color:var(--ms-dim);margin-top:1rem}
-.ms-tabs{display:flex;gap:.5rem;margin:0 0 1.5rem;border-bottom:1px solid currentColor}
+.ms-tabs{display:flex;gap:.5rem;margin:0 0 1.5rem;border-bottom:1px solid currentColor;position:sticky;top:0;background:#131517;z-index:10;padding-top:.5rem}
 .ms-tab{background:none;border:none;padding:.4rem .8rem;cursor:pointer;font:inherit;color:inherit;opacity:.55;border-bottom:2px solid transparent;margin-bottom:-1px}
 .ms-tab.is-active{opacity:1;border-bottom-color:currentColor;font-weight:600}
 .ms-section[data-tab]{display:none}
@@ -389,7 +407,7 @@ async function main() {
   </div>
 ${renderSection("Reading", PROFILE_LINKS.books, books.data, books.error, "books")}
 ${renderSection("Watching \u2014 Film", PROFILE_LINKS.film, film.data, film.error, "film")}
-${renderSection("Watching \u2014 TV", PROFILE_LINKS.tv, tv.data, tv.error, "tv")}
+${renderSection("Watching \u2014 TV", PROFILE_LINKS.tv, tv.data, tv.error, "tv", CONFIG.tvSection)}
   <div class="ms-updated">Updated ${new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })} PT</div>
 </div>`;
 
