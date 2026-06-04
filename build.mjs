@@ -328,7 +328,7 @@ function renderSection(label, profileUrl, list, error) {
   } else {
     body = list.slice(0, CONFIG.perSection).map(renderItem).join("\n");
   }
-  return `  <section class="ms-section">
+  return `  <section class="ms-section" data-tab="${tabId}">
     <h2 class="ms-heading"><a href="${escapeHtml(profileUrl)}">${escapeHtml(label)}</a></h2>
     <ul class="ms-list">
 ${body}
@@ -337,7 +337,7 @@ ${body}
 }
 
 const STYLE = `<style>
-.ms-stream{--ms-fg:inherit;--ms-dim:#888;font-size:.95rem;line-height:1.4}
+.ms-stream{--ms-fg:inherit;--ms-dim:#e4e4e7;font-size:.95rem;line-height:1.4;white-space:pre-wrap}
 .ms-section{margin:0 0 2rem}
 .ms-heading{font-size:1.1rem;margin:0 0 .5rem;border-bottom:1px solid currentColor;padding-bottom:.25rem}
 .ms-heading a{text-decoration:none}
@@ -352,6 +352,11 @@ const STYLE = `<style>
 .ms-note{font-size:.85rem;color:var(--ms-dim);margin-top:.15rem}
 .ms-error,.ms-empty{color:var(--ms-dim);font-style:italic}
 .ms-updated{font-size:.75rem;color:var(--ms-dim);margin-top:1rem}
+.ms-tabs{display:flex;gap:.5rem;margin:0 0 1.5rem;border-bottom:1px solid currentColor}
+.ms-tab{background:none;border:none;padding:.4rem .8rem;cursor:pointer;font:inherit;color:inherit;opacity:.55;border-bottom:2px solid transparent;margin-bottom:-1px}
+.ms-tab.is-active{opacity:1;border-bottom-color:currentColor;font-weight:600}
+.ms-section[data-tab]{display:none}
+.ms-section.is-active{display:block}
 </style>`;
 
 async function safe(fn) {
@@ -377,9 +382,14 @@ async function main() {
 
   const html = `${STYLE}
 <div class="ms-stream">
-${renderSection("Reading", PROFILE_LINKS.books, books.data, books.error)}
-${renderSection("Watching \u2014 Film", PROFILE_LINKS.film, film.data, film.error)}
-${renderSection("Watching \u2014 TV", PROFILE_LINKS.tv, tv.data, tv.error)}
+  <div class="ms-tabs">
+    <button class="ms-tab" data-target="books">Books</button>
+    <button class="ms-tab" data-target="film">Films</button>
+    <button class="ms-tab" data-target="tv">Television</button>
+  </div>
+${renderSection("Reading", PROFILE_LINKS.books, books.data, books.error, "books")}
+${renderSection("Watching \u2014 Film", PROFILE_LINKS.film, film.data, film.error, "film")}
+${renderSection("Watching \u2014 TV", PROFILE_LINKS.tv, tv.data, tv.error, "tv")}
   <div class="ms-updated">Updated ${new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })} PT</div>
 </div>`;
 
