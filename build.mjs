@@ -319,7 +319,7 @@ function renderItem(it) {
       </li>`;
 }
 
-function renderSection(label, profileUrl, list, error) {
+function renderSection(label, profileUrl, list, error, tabId) {
   let body;
   if (error) {
     body = `      <li class="ms-error">Couldn\u2019t load right now.</li>`;
