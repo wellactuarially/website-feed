@@ -436,7 +436,7 @@ ${renderSection("Read", PROFILE_LINKS.books, books.data, books.error, "books")}
 ${renderSection("Currently Reading", PROFILE_LINKS.reading, reading.data, reading.error, "reading")}
 ${renderSection("Films", PROFILE_LINKS.film, film.data, film.error, "film")}
 ${renderSection("TV", PROFILE_LINKS.tv, tv.data, tv.error, "tv", CONFIG.tvSection)}
-  <div class="ms-updated">Updated ${new Date().toLocaleDateString("en-US", { timeZone: "America/Los_Angeles" })} PT</div>
+  <div class="ms-updated">Updated ${new Date().toLocaleDateString("en-US", { timeZone: "America/Los_Angeles" })}</div>
 </div>`;
 
   await writeFile("feed.html", html, "utf8");
