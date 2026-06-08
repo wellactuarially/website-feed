@@ -318,7 +318,7 @@ async function fetchTv() {
     const slug = show.ids && show.ids.slug ? show.ids.slug : null;
     const image = await tmdbPoster(show.ids && show.ids.tmdb);
     const epId = ep.ids && ep.ids.trakt;
-    const c = epId != null ? commentsMap[epId] : null;
+    const c = epId != null ? notesMap[epId] : null;
     // Hide whole-comment spoilers from the public feed entirely.
     const note = c && !c.wholeSpoiler ? c.text : "";
     const rating = epId != null ? (ratingsMap[epId] ?? null) : null;
