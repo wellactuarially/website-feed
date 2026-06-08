@@ -19,6 +19,8 @@
 .ms-tab.is-active{opacity:1;border-bottom-color:currentColor;font-weight:600}
 .ms-section[data-tab]{display:none}
 .ms-section.is-active{display:block}
+.ms-spoiler{filter:blur(5px);cursor:pointer;border-radius:2px;transition:filter .15s;background:rgba(128,128,128,.15)}
+.ms-spoiler.revealed{filter:none}
 </style>
 <div class="ms-stream">
   <div class="ms-tabs">
@@ -290,73 +292,7 @@ A bone to pick, which I tried to not let get to me too much, was Andy Sachs goin
   <section class="ms-section" data-tab="tv">
     <h2 class="ms-heading"><a href="https://trakt.tv/users/wellactuarially/history/episodes">TV</a></h2>
     <ul class="ms-list">
-      <li class="ms-item">
-        <img class="ms-cover" src="https://image.tmdb.org/t/p/w92/xDUoAsU8lQHOOoRkFiBuarmACDN.jpg" alt="" loading="lazy" />
-        <div class="ms-item-body">
-          <a class="ms-title" href="https://trakt.tv/shows/daredevil-born-again">Daredevil: Born Again — S01E03</a>
-          <span class="ms-meta">The Hollow of His Hand · ★★★★</span>
-          <span class="ms-date">Jun 8, 2026</span>
-          
-        </div>
-      </li>
-      <li class="ms-item">
-        <img class="ms-cover" src="https://image.tmdb.org/t/p/w92/xDUoAsU8lQHOOoRkFiBuarmACDN.jpg" alt="" loading="lazy" />
-        <div class="ms-item-body">
-          <a class="ms-title" href="https://trakt.tv/shows/daredevil-born-again">Daredevil: Born Again — S01E02</a>
-          <span class="ms-meta">Optics · ★★★★½</span>
-          <span class="ms-date">Jun 7, 2026</span>
-          
-        </div>
-      </li>
-      <li class="ms-item">
-        <img class="ms-cover" src="https://image.tmdb.org/t/p/w92/oHLZyN7G7EpXCHxYdpMcuUNCUgS.jpg" alt="" loading="lazy" />
-        <div class="ms-item-body">
-          <a class="ms-title" href="https://trakt.tv/shows/taskmaster">Taskmaster — S21E09</a>
-          <span class="ms-meta">Maybe Someone Else Wrote Veep? · ★★★★★</span>
-          <span class="ms-date">Jun 7, 2026</span>
-          
-        </div>
-      </li>
-      <li class="ms-item">
-        <img class="ms-cover" src="https://image.tmdb.org/t/p/w92/oHLZyN7G7EpXCHxYdpMcuUNCUgS.jpg" alt="" loading="lazy" />
-        <div class="ms-item-body">
-          <a class="ms-title" href="https://trakt.tv/shows/taskmaster">Taskmaster — S21E08</a>
-          <span class="ms-meta">I Don't Got Any · ★★★★½</span>
-          <span class="ms-date">Jun 6, 2026</span>
-          <div class="ms-note">The tasks in this episode were exceptionally good.</div>
-        </div>
-      </li>
-      <li class="ms-item">
-        <img class="ms-cover" src="https://image.tmdb.org/t/p/w92/oHLZyN7G7EpXCHxYdpMcuUNCUgS.jpg" alt="" loading="lazy" />
-        <div class="ms-item-body">
-          <a class="ms-title" href="https://trakt.tv/shows/taskmaster">Taskmaster — S21E07</a>
-          <span class="ms-meta">Putting Things on Things · ★★★★★</span>
-          <span class="ms-date">Jun 5, 2026</span>
-          
-        </div>
-      </li>
-      <li class="ms-item">
-        <img class="ms-cover" src="https://image.tmdb.org/t/p/w92/xDUoAsU8lQHOOoRkFiBuarmACDN.jpg" alt="" loading="lazy" />
-        <div class="ms-item-body">
-          <a class="ms-title" href="https://trakt.tv/shows/daredevil-born-again">Daredevil: Born Again — S01E01</a>
-          <span class="ms-meta">Heaven's Half Hour · ★★★½</span>
-          <span class="ms-date">Jun 4, 2026</span>
-          <div class="ms-note">I have exactly no idea what is going on (don't remember where Daredevil left off) but I think I am enjoying the ride.
-
-It is going to take a lot to bring me back to a superhero show though.
-
-Going in its favor: I do love Charlie Cox and Vincent D'Onofrio and this whole cast. And the stakes are properly set.</div>
-        </div>
-      </li>
-      <li class="ms-item">
-        <img class="ms-cover" src="https://image.tmdb.org/t/p/w92/5lcxWLVAEICkFpuAiV1aMy7ZZj3.jpg" alt="" loading="lazy" />
-        <div class="ms-item-body">
-          <a class="ms-title" href="https://trakt.tv/shows/widow-s-bay">Widow's Bay — S01E08</a>
-          <span class="ms-meta">Your Baggage · ★★★★</span>
-          <span class="ms-date">Jun 2, 2026</span>
-          <div class="ms-note">I really liked this episode (this is just a test review).</div>
-        </div>
-      </li>
+      <li class="ms-error">Couldn’t load right now.</li>
     </ul>
   </section>
   <div class="ms-updated">Updated 6/8/2026</div>
