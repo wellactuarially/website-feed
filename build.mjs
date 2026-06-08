@@ -79,6 +79,16 @@ function stripTagsKeepBreaks(s) {
   return t;
 }
 
+// Wrap Trakt inline [spoiler]...[/spoiler] in click-to-reveal spans.
+// Input must already be HTML-escaped; the [spoiler] markers are literal text
+// from Trakt (not HTML), so they pass through escapeHtml untouched.
+function wrapSpoilers(escaped) {
+  return escaped.replace(
+    /\[spoiler\]([\s\S]*?)\[\/spoiler\]/gi,
+    '<span class="ms-spoiler">$1</span>'
+  );
+}
+
 // Pull the inner text of the FIRST <tag>...</tag> inside a chunk.
 function tag(chunk, name) {
   const m = chunk.match(new RegExp(`<${name}[^>]*>([\\s\\S]*?)</${name}>`, "i"));
@@ -208,7 +218,7 @@ async function tmdbPoster(tmdbId) {
   }
 }
 
-async function fetchTvNotes() {
+async function fetchTvComments() {
   if (!CONFIG.traktClientId) return {};
   const map = {};
   const headers = {
@@ -218,24 +228,27 @@ async function fetchTvNotes() {
     "User-Agent": "media-stream/1.0 (https://github.com/wellactuarially/website-feed)",
   };
   try {
-    for (let page = 1; page <= 20; page++) {   // safety cap: 20 pages = 2000 notes
+    for (let page = 1; page <= 20; page++) {
       const res = await fetch(
-        `https://api.trakt.tv/users/${CONFIG.traktUsername}/notes?limit=100&page=${page}`,
+        `https://api.trakt.tv/users/${CONFIG.traktUsername}/comments?limit=100&page=${page}`,
         { headers }
       );
       if (!res.ok) break;
       const rows = await res.json();
-      if (!rows.length) break;                 // no more pages
+      if (!rows.length) break;
       for (const row of rows) {
         if (
           row.type === "episode" &&
-          row.note && row.note.privacy === "public" &&
-          row.episode && row.episode.ids && row.episode.ids.trakt != null
+          row.episode && row.episode.ids && row.episode.ids.trakt != null &&
+          row.comment
         ) {
-          map[row.episode.ids.trakt] = row.note.notes || "";
+          map[row.episode.ids.trakt] = {
+            text: row.comment.comment || "",
+            wholeSpoiler: row.comment.spoiler === true,
+          };
         }
       }
-      if (rows.length < 100) break;            // last page was partial → done
+      if (rows.length < 100) break;
     }
   } catch { /* fall through with whatever we have */ }
   return map;
@@ -291,7 +304,7 @@ async function fetchTv() {
     throw new Error(`Trakt HTTP ${res.status} :: ${body}`);
   }
   const rows = await res.json();
-  const notesMap = await fetchTvNotes();
+  const notesMap = await fetchTvComments();
   const ratingsMap = await fetchTvRatings();
   return Promise.all(rows.map(async (row) => {
     const show = row.show || {};
@@ -305,7 +318,9 @@ async function fetchTv() {
     const slug = show.ids && show.ids.slug ? show.ids.slug : null;
     const image = await tmdbPoster(show.ids && show.ids.tmdb);
     const epId = ep.ids && ep.ids.trakt;
-    const note = epId != null ? (notesMap[epId] || "") : "";
+    const c = epId != null ? commentsMap[epId] : null;
+    // Hide whole-comment spoilers from the public feed entirely.
+    const note = c && !c.wholeSpoiler ? c.text : "";
     const rating = epId != null ? (ratingsMap[epId] ?? null) : null;
     return {
       type: "tv",
@@ -347,7 +362,7 @@ function renderItem(it) {
   const rate = stars(it.rating);
   const meta = [it.creator, rate].filter(Boolean).join(" \u00b7 ");
   const date = fmtDate(it.date);
-  const note = it.note ? `<div class="ms-note">${escapeHtml(it.note)}</div>` : "";
+  const note = it.note ? `<div class="ms-note">${wrapSpoilers(escapeHtml(it.note))}</div>` : "";
   const cover = it.image
     ? `<img class="ms-cover" src="${escapeHtml(it.image)}" alt="" loading="lazy" />`
     : "";
@@ -400,6 +415,8 @@ const STYLE = `<style>
 .ms-tab.is-active{opacity:1;border-bottom-color:currentColor;font-weight:600}
 .ms-section[data-tab]{display:none}
 .ms-section.is-active{display:block}
+.ms-spoiler{filter:blur(5px);cursor:pointer;border-radius:2px;transition:filter .15s;background:rgba(128,128,128,.15)}
+.ms-spoiler.revealed{filter:none}
 </style>`;
 
 async function safe(fn) {
