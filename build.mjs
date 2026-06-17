@@ -181,7 +181,12 @@ async function fetchFilm() {
       const rawDesc = tag(it, "description");
       const imgMatch = rawDesc.match(/<img[^>]+src="([^"]+)"/i);
       const image = imgMatch ? imgMatch[1] : null;
-      const review = stripTagsKeepBreaks(rawDesc);
+      let review = stripTagsKeepBreaks(rawDesc);
+      // Letterboxd prepends this literal line when a review is flagged as a
+      // spoiler. Detect it, strip the line, and mark the whole review to blur.
+      const spoilerWarning = /^This review may contain spoilers\.\s*/i;
+      const filmSpoiler = spoilerWarning.test(review);
+      if (filmSpoiler) review = review.replace(spoilerWarning, "");
       // watchedDate is the diary date; fall back to pubDate.
       const dateStr = tag(it, "letterboxd:watchedDate") || tag(it, "pubDate");
       return {
@@ -192,6 +197,7 @@ async function fetchFilm() {
         // The description repeats the poster + "Watched on ..." text; only keep
         // it if there's an actual review beyond the boilerplate.
         note: /Watched on/i.test(review) ? "" : review,
+        noteSpoiler: filmSpoiler,
         date: dateStr ? new Date(dateStr) : null,
         link: tag(it, "link"),
         image,
@@ -362,7 +368,11 @@ function renderItem(it) {
   const rate = stars(it.rating);
   const meta = [it.creator, rate].filter(Boolean).join(" \u00b7 ");
   const date = fmtDate(it.date);
-  const note = it.note ? `<div class="ms-note">${wrapSpoilers(escapeHtml(it.note))}</div>` : "";
+  let noteInner = wrapSpoilers(escapeHtml(it.note || ""));
+  if (it.noteSpoiler && it.note) {
+    noteInner = `<span class="ms-spoiler">${noteInner}</span>`;
+  }
+  const note = it.note ? `<div class="ms-note">${noteInner}</div>` : "";
   const cover = it.image
     ? `<img class="ms-cover" src="${escapeHtml(it.image)}" alt="" loading="lazy" />`
     : "";
@@ -386,9 +396,12 @@ function renderSection(label, profileUrl, list, error, tabId, limit = CONFIG.per
   } else {
     body = list.slice(0, limit).map(renderItem).join("\n");
   }
+  const spoilerNote = (tabId === "film" || tabId === "tv")
+    ? `    <p class="ms-spoiler-warn">Heads up: blurred text hides spoilers — tap to reveal at your own risk.</p>\n`
+    : "";
   return `  <section class="ms-section" data-tab="${tabId}">
     <h2 class="ms-heading"><a href="${escapeHtml(profileUrl)}">${escapeHtml(label)}</a></h2>
-    <ul class="ms-list">
+${spoilerNote}    <ul class="ms-list">
 ${body}
     </ul>
   </section>`;
@@ -417,6 +430,7 @@ const STYLE = `<style>
 .ms-section.is-active{display:block}
 .ms-spoiler{filter:blur(5px);cursor:pointer;border-radius:2px;transition:filter .15s;background:rgba(128,128,128,.15)}
 .ms-spoiler.revealed{filter:none}
+.ms-spoiler-warn{font-size:.78rem;color:var(--ms-dim);font-style:italic;margin:0 0 .6rem;opacity:.8}
 </style>`;
 
 async function safe(fn) {
