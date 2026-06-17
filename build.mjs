@@ -184,7 +184,7 @@ async function fetchFilm() {
       let review = stripTagsKeepBreaks(rawDesc);
       // Letterboxd prepends this literal line when a review is flagged as a
       // spoiler. Detect it, strip the line, and mark the whole review to blur.
-      const spoilerWarning = /^This review may contain spoilers\.\s*/i;
+      const spoilerWarning = /^This review may contain spoilers\.[ \t\r\n]*/i;
       const filmSpoiler = spoilerWarning.test(review);
       if (filmSpoiler) review = review.replace(spoilerWarning, "");
       // watchedDate is the diary date; fall back to pubDate.
@@ -310,7 +310,7 @@ async function fetchTv() {
     throw new Error(`Trakt HTTP ${res.status} :: ${body}`);
   }
   const rows = await res.json();
-  const notesMap = await fetchTvComments();
+  const commentsMap = await fetchTvComments();
   const ratingsMap = await fetchTvRatings();
   return Promise.all(rows.map(async (row) => {
     const show = row.show || {};
@@ -324,9 +324,8 @@ async function fetchTv() {
     const slug = show.ids && show.ids.slug ? show.ids.slug : null;
     const image = await tmdbPoster(show.ids && show.ids.tmdb);
     const epId = ep.ids && ep.ids.trakt;
-    const c = epId != null ? notesMap[epId] : null;
-    // Hide whole-comment spoilers from the public feed entirely.
-    const note = c && !c.wholeSpoiler ? c.text : "";
+    const c = epId != null ? commentsMap[epId] : null;
+    const note = c ? c.text : "";
     const rating = epId != null ? (ratingsMap[epId] ?? null) : null;
     return {
       type: "tv",
