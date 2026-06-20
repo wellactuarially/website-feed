@@ -182,11 +182,19 @@ async function fetchFilm() {
       const imgMatch = rawDesc.match(/<img[^>]+src="([^"]+)"/i);
       const image = imgMatch ? imgMatch[1] : null;
       let review = stripTagsKeepBreaks(rawDesc);
-      // Letterboxd prepends this literal line when a review is flagged as a
-      // spoiler. Detect it, strip the line, and mark the whole review to blur.
-      const spoilerWarning = /^This review may contain spoilers\.[ \t\r\n]*/i;
-      const filmSpoiler = spoilerWarning.test(review);
-      if (filmSpoiler) review = review.replace(spoilerWarning, "");
+      // Strip Letterboxd's spoiler-flag prefix line (we don't want that verbiage).
+      review = review.replace(/^This review may contain spoilers\.[ \t\r\n]*/i, "");
+      // Convention: a paragraph starting with "Spoilers:" marks the spoiler
+      // section. Keep the "Spoilers:" label visible; wrap everything after it in
+      // [spoiler] tags so it blurs (revealable). Strict: marker must start a line.
+      const sm = review.match(/(^|\n)(spoilers:)/i);
+      if (sm) {
+        const idx = sm.index + sm[1].length;
+        const after = review.slice(idx + sm[2].length);
+        if (after.trim()) {
+          review = review.slice(0, idx) + sm[2] + "[spoiler]" + after + "[/spoiler]";
+        }
+      }
       // watchedDate is the diary date; fall back to pubDate.
       const dateStr = tag(it, "letterboxd:watchedDate") || tag(it, "pubDate");
       return {
@@ -197,7 +205,6 @@ async function fetchFilm() {
         // The description repeats the poster + "Watched on ..." text; only keep
         // it if there's an actual review beyond the boilerplate.
         note: /Watched on/i.test(review) ? "" : review,
-        noteSpoiler: filmSpoiler,
         date: dateStr ? new Date(dateStr) : null,
         link: tag(it, "link"),
         image,
@@ -371,7 +378,7 @@ function renderItem(it) {
   if (it.noteSpoiler && it.note) {
     noteInner = `<span class="ms-spoiler">${noteInner}</span>`;
   }
-  const note = it.note ? `<div class="ms-note">${noteInner}</div>` : "";
+  const note = it.note ? `<div class="ms-note">${wrapSpoilers(escapeHtml(it.note))}</div>` : "";
   const cover = it.image
     ? `<img class="ms-cover" src="${escapeHtml(it.image)}" alt="" loading="lazy" />`
     : "";
