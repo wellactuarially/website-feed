@@ -1,37 +1,44 @@
 # media-stream
 
-Builds a static HTML fragment of your recent **books** (Goodreads), **film**
-(Letterboxd), and **TV** (Trakt) activity. A GitHub Action rebuilds it daily and
-publishes it via GitHub Pages; a small loader on your [Bear Blog](https://bearblog.dev)
-page pulls it in, so the page stays current on its own — no server, no manual
-re-pasting.
+A little widget that shows what I've been reading and watching. It pulls recent
+**books** and **currently-reading** from Goodreads, **film** from Letterboxd, and
+**TV** from Trakt, and renders the lot as a single HTML fragment. A GitHub Action
+rebuilds it every night, GitHub Pages hosts the result, and a snippet on my
+[Bear Blog](https://bearblog.dev) page loads it in. Once it's set up there's
+nothing to maintain.
 
-Three sections, 10 most recent items each, each
-section header links to your profile on that service. Every item can show a
-cover/poster, a rating, and your review. If any one source is down, the other
-two still render.
+There are four tabs: **Books** (finished), **Reading Now**, **Films**, and
+**Television**. Each section heading links out to the matching profile, and each
+item can carry a cover, a rating, a review, and a date. If one source falls over
+the rest of the page still loads.
 
 ---
 
 ## How it works
 
-- `build.mjs` fetches all three sources, normalizes them into one shape, and
-  writes `feed.html` (an HTML fragment with its own inline `<style>`).
-- **Goodreads** and **Letterboxd** are read as RSS (no key). **Trakt** is read
-  via its free API with your **Client ID** only — no OAuth, which requires the profile
-  is public. **TMDB** supplies TV posters (Trakt has none) via a free read token.
-- The script runs **inside GitHub Actions**, server-side.
-- The Action commits `feed.html` to the repo. **GitHub Pages** serves it at a
-  public URL, and a tiny loader on a Bear page fetches that URL at view time.
-  Commit → Pages republishes → Bear page reflects it. Hands-off after setup.
+- `build.mjs` grabs each source, flattens them into one common shape, and writes
+  `feed.html` (markup plus an inline `<style>`).
+- Goodreads and Letterboxd come in as RSS, no key needed. Trakt uses its free API
+  with just a Client ID — no OAuth, since the profile is public. TMDB fills in the
+  TV posters that Trakt history doesn't include, using a free read token.
+- Everything runs server-side in GitHub Actions, which sidesteps CORS and keeps
+  the keys off the public page.
+- The Action commits `feed.html`, Pages serves it, and the Bear loader fetches
+  that URL when someone views the page. Commit, Pages republishes, the page
+  updates. No babysitting.
+- The tabs and the spoiler reveal are handled by JS in the Bear loader rather than
+  inside `feed.html`. The loader injects the fragment with `innerHTML`, and
+  scripts injected that way never run — so anything interactive has to live in the
+  loader, which is a real `<script>` and does run.
 
 ### Data per source
 
-| Source     | Read via            | Cover        | Rating              | Review            |
-|------------|---------------------|--------------|---------------------|-------------------|
-| Goodreads  | RSS                 | from RSS     | user_rating (0–5)   | full review       |
-| Letterboxd | RSS                 | from RSS     | memberRating (0–5)  | full review       |
-| Trakt      | API (Client ID)     | via TMDB id  | episode rating ÷ 2  | public note text  |
+| Source            | Read via         | Cover       | Rating             | Review                    |
+|-------------------|------------------|-------------|--------------------|---------------------------|
+| Goodreads (read)  | RSS              | from RSS    | user_rating (0–5)  | full review               |
+| Goodreads (now)   | RSS              | from RSS    | —                  | —                         |
+| Letterboxd        | RSS              | from RSS    | memberRating (0–5) | full review + spoiler tail|
+| Trakt             | API (Client ID)  | via TMDB id | episode rating ÷ 2 | public episode comment    |
 
 Trakt rates 0–10; it's halved to match the 0–5 star scale used by the others.
 
@@ -51,9 +58,9 @@ Trakt rates 0–10; it's halved to match the 0–5 star scale used by the others
 
 Save, copy the **Client ID** (ignore the Client Secret — that's only for OAuth).
 
-Your Trakt **profile must be public** for the key-only read to work
-(Settings → Account → make sure "Private" is unchecked). History, notes, and
-ratings are all read from your public profile.
+The Trakt **profile must be public** for the key-only read to work
+(Settings → Account → "Private" unchecked). History, comments, and ratings are
+all read from the public profile.
 
 ### 2. Register a free TMDB read token (for TV posters)
 
@@ -71,11 +78,12 @@ The repo must be **public** for GitHub Pages to serve `feed.html` for free.
 
 Under **Variables**:
 
-| Name             | Value                                                                   |
-|------------------|-------------------------------------------------------------------------|
-| `GOODREADS_RSS`  | `https://www.goodreads.com/review/list_rss/173090020-marcus?shelf=read` |
-| `LETTERBOXD_RSS` | `https://letterboxd.com/wellactuarially/rss`                            |
-| `TRAKT_USERNAME` | `wellactuarially`                                                       |
+| Name                   | Value                                                                                |
+|------------------------|--------------------------------------------------------------------------------------|
+| `GOODREADS_RSS`        | `https://www.goodreads.com/review/list_rss/173090020-marcus?shelf=read`              |
+| `GOODREADS_READING_RSS`| `https://www.goodreads.com/review/list_rss/173090020-marcus?shelf=currently-reading` |
+| `LETTERBOXD_RSS`       | `https://letterboxd.com/wellactuarially/rss`                                         |
+| `TRAKT_USERNAME`       | `wellactuarially`                                                                    |
 
 Under **Secrets**:
 
@@ -96,20 +104,22 @@ Actions tab.)
 **Settings → Pages** → Source: **Deploy from a branch** → Branch: `main`,
 folder `/ (root)`. It auto-saves (no Save button). Wait for the first deploy
 (watch the "pages build and deployment" run in Actions, or the Environments
-section on the repo home). Your feed will be live at:
+section on the repo home). The feed will be live at:
 
 ```
 https://<username>.github.io/<repo>/feed.html
 ```
 
-Confirm it loads in a browser before wiring up Bear. (curl check:
-`curl -s -o /dev/null -w "%{http_code}\n" https://<username>.github.io/<repo>/feed.html`
+Confirm it loads in a browser before wiring up Bear. (Status check, in
+**Command Prompt** — real curl, not PowerShell's alias:
+`curl -s -o NUL -w "%{http_code}\n" https://<username>.github.io/<repo>/feed.html`
 — `200` means live, `404` means still deploying.)
 
 ### 7. Add the loader to a Bear page
 
-Create a Bear page (e.g. titled "Lately") and paste this — **not** the feed HTML
-itself, just this loader, which fetches the published feed at view time:
+Create a Bear page (e.g. titled "Lately") and paste this loader — **not** the
+feed HTML itself. It fetches the published feed at view time, then wires up the
+tabs and the spoiler reveal:
 
 ```html
 <div id="media-stream-mount">Loading…</div>
@@ -121,6 +131,23 @@ itself, just this loader, which fetches the published feed at view time:
     const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) throw new Error("HTTP " + res.status);
     mount.innerHTML = await res.text();
+
+    // --- tab switching ---
+    const tabs = mount.querySelectorAll(".ms-tab");
+    const sections = mount.querySelectorAll(".ms-section[data-tab]");
+    function show(target) {
+      tabs.forEach(t => t.classList.toggle("is-active", t.dataset.target === target));
+      sections.forEach(s => s.classList.toggle("is-active", s.dataset.tab === target));
+    }
+    if (tabs.length) show(tabs[0].dataset.target);
+    tabs.forEach(t => t.addEventListener("click", () => show(t.dataset.target)));
+
+    // --- spoiler reveal: tap a blurred span to show it ---
+    mount.addEventListener("click", function (e) {
+      const sp = e.target.closest(".ms-spoiler");
+      if (sp) sp.classList.toggle("revealed");
+    });
+
   } catch (e) {
     mount.innerHTML = "<p style='color:#888;font-style:italic'>Couldn’t load the stream right now.</p>";
   }
@@ -128,9 +155,12 @@ itself, just this loader, which fetches the published feed at view time:
 </script>
 ```
 
-`feed.html` carries its own `<style>`, so it self-styles. From here it's
-automatic: the Action rebuilds daily, Pages republishes, the Bear page shows the
-latest with no action from you.
+`feed.html` brings its own `<style>`, so it looks right on its own. After this
+the whole thing runs itself: the Action rebuilds nightly, Pages republishes, the
+Bear page picks up the change.
+
+> The tabs aren't sticky; they scroll with the page. I tried a sticky version but
+> it kept colliding with the site's own sticky header, so I gave up on it.
 
 ---
 
@@ -138,42 +168,69 @@ latest with no action from you.
 
 - **Books / film:** rate and review on Goodreads / Letterboxd as usual; they flow
   in via RSS.
-- **TV reviews:** add a **public note** to an episode on Trakt (notes can be
-  marked public without VIP). Only `privacy: "public"` notes are surfaced; private
-  notes stay private. Notes are matched to episodes by Trakt episode id.
-- **TV ratings:** rate the **episode** on Trakt (not just the show — the feed
-  reads `/ratings/episodes`). Ratings only appear for episodes currently in the
-  recent-history window.
+- **TV reviews:** post a **public comment** on an episode on Trakt (free, no VIP).
+  Comments carry both the review text *and* a `user_rating`, so they're the single
+  source for TV review text. Matched to episodes by Trakt episode id.
+- **TV ratings:** the star comes from `/ratings/episodes`. Rate the **episode**
+  (not just the show). Ratings only appear for episodes in the recent-history
+  window.
+
+### Spoilers
+
+How spoilers get hidden depends on the source, because each one exposes them
+differently.
+
+On **Trakt**, wrap the spoiler bit in `[spoiler]...[/spoiler]` inside the comment.
+That part renders blurred and reveals on tap; the rest of the comment reads
+normally.
+
+On **Letterboxd** there are no inline tags, so I use a convention instead: start a
+paragraph with `Spoilers:` (any capitalization, but it has to begin a line).
+Everything from there to the end of the review gets blurred, while the `Spoilers:`
+label itself stays put as a heads-up. The intro before it is always safe to read.
+Letterboxd also prepends its own "This review may contain spoilers." line when you
+flag a review; that line just gets stripped, so lean on the `Spoilers:` convention
+rather than the flag.
+
+**Goodreads** strips spoiler-tagged text out of the RSS before I ever see it
+(you get a literal `[spoilers removed]` instead), so there's nothing to do on the
+book side.
+
+Both the Films and Television sections carry a small note under the heading
+reminding readers that blurred text is a spoiler.
 
 ---
 
 ## Running locally (optional)
 
-```bash
-export GOODREADS_RSS="https://www.goodreads.com/review/list_rss/173090020-marcus?shelf=read"
-export LETTERBOXD_RSS="https://letterboxd.com/wellactuarially/rss"
-export TRAKT_USERNAME="wellactuarially"
-export TRAKT_CLIENT_ID="your_client_id"
-export TMDB_TOKEN="your_tmdb_read_token"
+```bat
+set GOODREADS_RSS=https://www.goodreads.com/review/list_rss/173090020-marcus?shelf=read
+set GOODREADS_READING_RSS=https://www.goodreads.com/review/list_rss/173090020-marcus?shelf=currently-reading
+set LETTERBOXD_RSS=https://letterboxd.com/wellactuarially/rss
+set TRAKT_USERNAME=wellactuarially
+set TRAKT_CLIENT_ID=your_client_id
+set TMDB_TOKEN=your_tmdb_read_token
 node build.mjs
-# open feed.html
+:: open feed.html
 ```
 
-`node test-local.mjs` runs the parser/renderer against mock fixtures with no
-network — useful when tweaking rendering.
+(That's Command Prompt syntax; on macOS/Linux use `export` instead of `set`.)
 
 ---
 
 ## Customizing
 
-- **Items per section:** `perSection` in `build.mjs` (the Trakt history `?limit=`
-  is wired to it).
-- **Section labels / order:** the `renderSection(...)` calls in `main()`.
+- **Items per section:** `perSection` in `build.mjs` (books/film/reading); TV uses
+  its own `tvSection` (currently 25), wired to the Trakt history `?limit=`.
+- **Section labels / order:** the tab buttons in `main()` and the `renderSection(...)`
+  calls. Tab order follows the button order; section visibility is driven by the
+  loader's `show()`.
 - **Schedule:** the `cron` line in `.github/workflows/build.yml`. Cron is **UTC**.
   Current: `0 9 * * *` ≈ 2 AM Pacific (drifts one hour with daylight saving —
   fine for a daily rebuild).
-- **Styling:** the `STYLE` constant; colors inherit from your Bear theme
-  (`--ms-dim` is the muted gray). Cover size is `.ms-cover { width }`.
+- **Styling:** the `STYLE` constant; colors inherit from the Bear theme.
+  `--ms-dim` drives the secondary text colour (currently `#e4e4e7`). Cover size is
+  `.ms-cover { width }`. Spoiler blur is `.ms-spoiler { filter: blur() }`.
 - **Star scale:** TV ratings are halved (Trakt 0–10 → 0–5). Adjust in
   `fetchTvRatings`.
 
@@ -181,17 +238,22 @@ network — useful when tweaking rendering.
 
 ## How TV data is assembled
 
-`fetchTv` makes a few Trakt calls per build, each into a lookup keyed by episode
-Trakt id, then merged onto the history rows:
+`fetchTv` hits Trakt a few times per build. Each call becomes a lookup keyed by
+episode Trakt id, then everything gets stitched onto the history rows:
 
 1. `/users/{user}/history/shows` — the recent episodes themselves.
-2. `/users/{user}/notes` — public episode notes → review text (paginated).
-3. `/users/{user}/ratings/episodes` — episode ratings → stars (paginated).
-4. TMDB `/3/tv/{tmdb_id}` per show — poster image.
+2. `/users/{user}/comments` — public episode comments, used as review text (paginated).
+3. `/users/{user}/ratings/episodes` — episode ratings, used for stars (paginated).
+4. TMDB `/3/tv/{tmdb_id}` per show — the poster.
 
-Notes and ratings paginate (100/page) so they scale past 100 entries. All Trakt
-requests send a `User-Agent` header — without it, Cloudflare (in front of Trakt)
-blocks requests from GitHub Actions' datacenter IPs with a 403.
+Comments and ratings page through 100 at a time so they keep working past 100
+entries. Every Trakt request carries a `User-Agent` header. This matters more than
+it looks: without it, the Cloudflare layer in front of Trakt blocks GitHub
+Actions' datacenter IPs with a 403, even though the exact same request from a home
+connection sails through. That one cost me an evening.
+
+Comments flagged as whole spoilers still show up in full; the blurring is driven
+entirely by the inline `[spoiler]` tags, so only the tagged portion is hidden.
 
 ---
 
@@ -199,14 +261,23 @@ blocks requests from GitHub Actions' datacenter IPs with a 403.
 
 - **RSS windows:** Goodreads/Letterboxd RSS carry only recent items
   (Letterboxd ~50). Good for a recent-activity stream; not a full-library mirror.
-- **Trakt free tier:** reading your own *public* profile (history, public notes,
+- **Trakt free tier:** reading the *public* profile (history, public comments,
   episode ratings) works without VIP and without OAuth. Trakt's RSS/iCal feeds
-  and *private* notes are the VIP/OAuth-gated features this deliberately avoids.
+  are the VIP-gated features this deliberately avoids. (Public **comments** have no
+  per-account quantity cap; personal **notes** do — comments are used here.)
 - **TMDB ids:** occasionally missing for obscure titles → that item just shows no
   cover (not an error).
 - **Graceful failure:** if a source errors, its section shows a quiet "Couldn't
-  load right now" and the rest of the page renders normally. TMDB/notes/ratings
+  load right now" and the rest of the page renders normally. TMDB/comments/ratings
   failures degrade silently (no cover / no review / no stars) rather than breaking
   the TV section.
 - **GitHub Pages lag:** Pages republishes a minute or two after each commit; the
   very first deploy can take longer.
+
+---
+
+## Backlog
+
+- Parallelize the Trakt comments + ratings calls (`Promise.all`), and maybe cache
+  the lookup maps between runs if builds ever start to drag. (There's an issue
+  open for this.)
