@@ -403,7 +403,7 @@ function renderSection(label, profileUrl, list, error, tabId, limit = CONFIG.per
     body = list.slice(0, limit).map(renderItem).join("\n");
   }
   const spoilerNote = (tabId === "film" || tabId === "tv")
-    ? `    <p class="ms-spoiler-warn">Heads up: blurred text hides spoilers — tap to reveal at your own risk.</p>\n`
+    ? `    <p class="ms-spoiler-warn">Blurred text hides spoilers — spoilers range from minor to major — tap to reveal at your own risk.</p>\n`
     : "";
   return `  <section class="ms-section" data-tab="${tabId}">
     <h2 class="ms-heading"><a href="${escapeHtml(profileUrl)}">${escapeHtml(label)}</a></h2>
